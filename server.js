@@ -16,6 +16,10 @@ app.get('/accounts', (req, res) => {
     res.status(200).send(store.accounts)
 })
 
+app.get('/accounts/:id', (req, res) => {
+    res.status(200).send(store.accounts[req.params.id])
+})
+
 app.post('/accounts', (req, res) => {
     let newAccount = req.body
     let id = store.accounts.length
