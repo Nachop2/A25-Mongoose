@@ -37,7 +37,7 @@ app.post('/accounts', async (req, res) => {
         name: req.body.name,
         balance: req.body.balance
     }).then(() => {
-        res.status(201).send("worked")
+        res.status(201).send("The account has been created")
     }).catch(() => {
         res.status(404).send("There has been an error creating an account")
     })
@@ -48,15 +48,18 @@ app.put('/accounts/:id', async (req, res) => {
         name: req.body.name,
         balance: req.body.balance
     }).then(() => {
-        res.status(201).send("worked")
+        res.status(201).send("Account has been updated")
     }).catch(() => {
         res.status(404).send("There has been an error updating the account")
     })
 })
 
-app.delete('/accounts/:id', (req, res) => {
-    store.accounts.splice(req.params.id, 1)
-    res.status(204).send()
+app.delete('/accounts/:id', async (req, res) => {
+    await Person.findByIdAndDelete(req.params.id).then(() => {
+        res.status(201).send("Account has been deleted")
+    }).catch(() => {
+        res.status(404).send("There has been an error deleting the account")
+    })
 })
 
 app.listen(3000)
