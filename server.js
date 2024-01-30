@@ -10,39 +10,48 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 app.use(errorhandler())
 
-await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 
 let personSchema = new mongoose.Schema({
     name: {
-      type: String,
-      required: true
+        type: String,
+        required: true
     },
     balance: Number,
-  });
+});
 
-let store = {}
-store.accounts = []
+let Person = mongoose.model('Person', personSchema);
 
-app.get('/accounts', (req, res) => {
-    res.status(200).send(store.accounts)
+app.get('/accounts', async (req, res) => {
+    res.status(200).send(await Person.find())
 })
 
-app.get('/accounts/:id', (req, res) => {
-    res.status(200).send(store.accounts[req.params.id])
+app.get('/accounts/:id', async (req, res) => {
+    res.status(200).send(await Person.findById(req.params.id))
 })
 
-app.post('/accounts', (req, res) => {
-    let newAccount = req.body
-    let id = store.accounts.length
-    store.accounts.push(newAccount)
-    res.status(201).send({ id: id })
+app.post('/accounts', async (req, res) => {
+    await Person.create({
+        name: req.body.name,
+        balance: req.body.balance
+    }).then(() => {
+        res.status(201).send("worked")
+    }).catch(() => {
+        res.status(404).send("There has been an error creating an account")
+    })
 })
 
-app.put('/accounts/:id', (req, res) => {
-    store.accounts[req.params.id] = req.body
-    res.status(200).send(store.accounts[req.params.id])
+app.put('/accounts/:id', async (req, res) => {
+    await Person.findByIdAndUpdate(req.params.id,{
+        name: req.body.name,
+        balance: req.body.balance
+    }).then(() => {
+        res.status(201).send("worked")
+    }).catch(() => {
+        res.status(404).send("There has been an error updating the account")
+    })
 })
 
 app.delete('/accounts/:id', (req, res) => {
