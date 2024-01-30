@@ -2,12 +2,25 @@ const express = require('express')
 const logger = require('morgan')
 const errorhandler = require('errorhandler')
 const bodyParser = require('body-parser')
-
+const mongoose = require('mongoose');
 let app = express()
+
+
 app.use(bodyParser.json())
 app.use(logger('dev'))
 app.use(errorhandler())
 
+await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+
+
+let personSchema = new mongoose.Schema({
+    name: {
+      type: String,
+      required: true
+    },
+    balance: Number,
+  });
 
 let store = {}
 store.accounts = []
